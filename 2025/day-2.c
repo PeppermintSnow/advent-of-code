@@ -19,13 +19,19 @@ typedef struct LinkedListNode {
 void processInput(char* input, LinkedListNode** head, LinkedListNode** tail);
 
 /*
- * Finds the invalid ID by specifications of AOC day 2 - part 1
+ * Finds the invalid ID in a range by specifications of AOC day 2
  *
  * @param start First ID in the range
  * @param end Last ID in the range
  * @return Sum of all invalid IDs in the range
  */
-long int findInvalidId(long int start, long int end);
+void findInvalidId(long int start, long int end, long int* password);
+
+/*
+ * Determines whether the given ID is invalid
+ *
+ */
+long int isInvalidId(long int id);
 
 int main(int argc, char** argv) {
     if (argc < 2) {
@@ -57,14 +63,21 @@ int main(int argc, char** argv) {
     processInput(buffer, &head, &tail);
 
     // Find invalid IDs!
-    long int password = 0;
+    // Part 1: IDs are invalid if the number is made of a sequence repeated twice
+    // Part 2: IDs are invalid if the number is made of a sequence repeated AT LEAST twice
+    // [0] Password for part 1; [1] Password for part 2
+    long int* password = malloc(sizeof(long int) * 2);
+    password[0] = 0;
+    password[1] = 0;
+
     tail = head;
     while (tail != NULL) {
-        password += findInvalidId(tail->first, tail->last);
+        findInvalidId(tail->first, tail->last, password);
         tail = tail->next;
     }
 
-    printf("The password is %ld!", password);
+    printf("The password for part 1 is %ld!\n", password[0]);
+    printf("The password for part 2 is %ld!\n", password[1]);
 
     // Free LinkedList
     tail = head;
@@ -111,8 +124,7 @@ void processInput(char* input, LinkedListNode** head, LinkedListNode** tail) {
     }
 }
 
-long int findInvalidId(long int start, long int end) {
-    long int sumOfInvalids = 0;
+void findInvalidId(long int start, long int end, long int* password) {
     for (long int i = start; i <= end; i++) {
         // Count digits
         int digits = 0;
@@ -122,24 +134,66 @@ long int findInvalidId(long int start, long int end) {
             digits++;
         }
 
-        // Odd digits can't be invalid
-        if (digits % 2 == 1) continue;
-
         char buffer[digits + 1];
         snprintf(buffer, digits + 1, "%ld", i);
         buffer[digits] = '\0';
 
-        int digitsHalved = digits / 2;
-        char firstHalf[digitsHalved + 1];
-        char secondHalf[digitsHalved + 1];
-        strncpy(firstHalf, buffer, digitsHalved);
-        strncpy(secondHalf, buffer + digitsHalved, digitsHalved);
-        firstHalf[digitsHalved] = '\0';
-        secondHalf[digitsHalved] = '\0';
-        
-        if (strcmp(firstHalf, secondHalf) == 0) {
-            sumOfInvalids += i;
+        int isCountedPart1 = 0;
+        int isCountedPart2 = 0;
+        // Take factors of digits
+        for (int j = 2; j < digits; j++) {
+            if (digits % j != 0) continue;
+
+            int segmentCount = digits / j;
+            if (segmentCount == 0) continue;
+
+            char** idSegments = malloc(segmentCount * sizeof(char*));
+
+            for (int k = 0; k < segmentCount; k++) {
+                idSegments[k] = malloc(j + 1);
+                strncpy(idSegments[k], buffer + (k * j), j);
+                idSegments[k][j] = '\0';
+            }
+
+            int isInvalid = 1;
+            for (int k = 0; k < segmentCount; k++) {
+                if (strcmp(idSegments[0], idSegments[k]) != 0) {
+                    isInvalid = 0;
+                    break;
+                }
+            }
+
+            // Free memory
+            for (int k = 0; k < segmentCount; k++) free(idSegments[k]);
+            free(idSegments);
+
+            if (!isInvalid) continue;
+
+            if (segmentCount == 2 && !isCountedPart1) {
+                password[0] += i;
+                isCountedPart1 = 1;
+            }
+
+            if (!isCountedPart2) {
+                password[1] += i;
+                isCountedPart2 = 1;
+            }
+        }
+
+        // Check for one repeated digits
+        if (!isCountedPart2 && digits > 1) {
+            int isInvalid = 1;
+            for (int j = 0; buffer[j] != '\0'; j++) {
+                if (buffer[0] != buffer[j]) {
+                    isInvalid = 0;
+                    break;
+                }
+            }
+
+            if (isInvalid) {
+                password[1] += i;
+                isCountedPart2 = 1;
+            }
         }
     }
-    return sumOfInvalids;
 }
