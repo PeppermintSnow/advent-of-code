@@ -9,7 +9,7 @@
  *
  * @param bank String of numbers
  */
-int findLargestCombination(char* bank);
+void findLargestCombination(char* bank, long int* password);
 
 int main(int argc, char** argv) {
     if (argc < 2) { 
@@ -24,60 +24,71 @@ int main(int argc, char** argv) {
         exit(1);
     }
 
-    int password = 0;
+    long int password[] = {0, 0};
+
     char buffer[BUFFER_SIZE];
     while (fgets(buffer, BUFFER_SIZE, fptr)) {
         buffer[strcspn(buffer, "\n")] = '\0';
-        password += findLargestCombination(buffer);
+        findLargestCombination(buffer, password);
     }
 
-    printf("The password for part 1 is %d!", password);
+    printf("The password for part 1 is %ld!\n", password[0]);
+    printf("The password for part 2 is %ld!", password[1]);
 
     return 0;
 }
 
-int findLargestCombination(char* bank) {
+void findLargestCombination(char* bank, long int* password) {
     int bankLen = strlen(bank);
 
-    char highestDigit[] = "0";
-    char secondHighestDigit[] = "0";
+    char highestDigitsPart1[3];
+    char highestDigitsPart2[13];
 
-    // Find highest digit
-    for (int i = 0; i < bankLen; i++) {
-        if ((highestDigit[0] - '0') < (bank[i] - '0')) {
-            highestDigit[0] = bank[i];
-        }
-    }
+    int indicesPart1[2];
+    int indicesPart2[12];
 
-    int indexOfHighestDigit = strcspn(bank, highestDigit);
+    highestDigitsPart1[2] = '\0';
+    highestDigitsPart2[12] = '\0';
 
-    if (bankLen - 1 == indexOfHighestDigit) {
-        // If highest digit is at the end
-        // Reverse search and swap positions
-        secondHighestDigit[0] = highestDigit[0];
-        highestDigit[0] = '0';
-        for (int i = bankLen - 2; i >= 0; i--) {
-            if ((highestDigit[0] - '0') < (bank[i] - '0')) {
-                highestDigit[0] = bank[i];
+    char prevIdx = -1;
+
+    // Part 1 (2 digits)
+    for (int i = 0; i < 2; i++) {
+        int startIdx = prevIdx + 1;
+        int endIdx = bankLen - (2 - i);
+
+        highestDigitsPart1[i] = bank[startIdx];
+        indicesPart1[i] = startIdx;
+
+        for (int j = startIdx; j <= endIdx; j++) {
+            if (highestDigitsPart1[i] < bank[j]) {
+                highestDigitsPart1[i] = bank[j];
+                indicesPart1[i] = j;
             }
         }
-    } else {
-        char newBankLen = bankLen - indexOfHighestDigit;
-        char newBank[newBankLen];
-        strncpy(newBank, bank + indexOfHighestDigit, newBankLen);
-        newBank[newBankLen] = '\0';
 
-        // Find second highest digit
-        for (int i = 1; i < newBankLen; i++) {
-            if ((secondHighestDigit[0] - '0') < (newBank[i] - '0')) {
-                secondHighestDigit[0] = newBank[i];
-            }
-        }
+        prevIdx = indicesPart1[i];
     }
 
-    char highestCombination[3];
-    highestCombination[0] = highestDigit[0];
-    highestCombination[1] = secondHighestDigit[0];
+    // Part 2 (12 digits)
+    prevIdx = -1;
+    for (int i = 0; i < 12; i++) {
+        int startIdx = prevIdx + 1;
+        int endIdx = bankLen - (12 - i);
 
-    return strtol(highestCombination, NULL, 10);
+        highestDigitsPart2[i] = bank[startIdx];
+        indicesPart2[i] = startIdx;
+
+        for (int j = startIdx; j <= endIdx; j++) {
+            if (highestDigitsPart2[i] < bank[j]) {
+                highestDigitsPart2[i] = bank[j];
+                indicesPart2[i] = j;
+            }
+        }
+
+        prevIdx = indicesPart2[i];
+    }
+
+    password[0] += strtol(highestDigitsPart1, NULL, 10);
+    password[1] += strtol(highestDigitsPart2, NULL, 10);
 }
