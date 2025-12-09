@@ -8,8 +8,8 @@
 #define INSTRUCTION_LENGTH 6
 
 typedef struct Node {
-    char* instruction;
-    struct Node* next;
+    char *instruction;
+    struct Node *next;
 } Node;
 
 /*
@@ -20,12 +20,12 @@ typedef struct Node {
  * @param value Rotation value which follows the form L/R0-99 e.g., L5, R99
  * @return New dial value
  */
-int rotateDial(int dial, int* timesDialHitsZero, char* instruction);
+int rotateDial(int dial, int *timesDialHitsZero, char *instruction);
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
     int dial = DIAL_START;
-    char** instructions;
-    FILE* fptr;
+    char **instructions;
+    FILE *fptr;
 
     if (argv[1]) {
         fptr = fopen(argv[1], "r");
@@ -38,14 +38,14 @@ int main(int argc, char** argv) {
         exit(1);
     }
 
-    Node* head = NULL;
-    Node* tail = NULL;
+    Node *head = NULL;
+    Node *tail = NULL;
 
     char buffer[INSTRUCTION_LENGTH];
     while (fgets(buffer, INSTRUCTION_LENGTH, fptr)) {
         buffer[strcspn(buffer, "\n")] = '\0';
 
-        Node* tempNode = malloc(sizeof(Node));
+        Node *tempNode = malloc(sizeof(Node));
 
         tempNode->instruction = malloc(INSTRUCTION_LENGTH);
         strncpy(tempNode->instruction, buffer, INSTRUCTION_LENGTH);
@@ -73,7 +73,7 @@ int main(int argc, char** argv) {
 
     tail = head;
     while(tail != NULL) {
-        Node* temp = tail;
+        Node *temp = tail;
         tail = tail->next;
         free(temp->instruction);
         free(temp);
@@ -84,7 +84,7 @@ int main(int argc, char** argv) {
     return 0;
 }
 
-int rotateDial(int dial, int* timesDialHitsZero, char* instruction) {
+int rotateDial(int dial, int *timesDialHitsZero, char *instruction) {
     char direction = instruction[0];
     if (direction != 'L' && direction != 'R') exit(1);
 

@@ -9,15 +9,15 @@
  *
  * @param bank String of numbers
  */
-void findLargestCombination(char* bank, long int* password);
+void findLargestCombination(char *bank, long int *password);
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
     if (argc < 2) { 
         printf("Please specify an input file");
         exit(1);
     }
 
-    FILE* fptr = fopen(argv[1], "r");
+    FILE *fptr = fopen(argv[1], "r");
     
     if (!fptr) {
         printf("Failed to open file");
@@ -38,7 +38,7 @@ int main(int argc, char** argv) {
     return 0;
 }
 
-void findLargestCombination(char* bank, long int* password) {
+void findLargestCombination(char *bank, long int *password) {
     int bankLen = strlen(bank);
 
     char highestDigitsPart1[3];

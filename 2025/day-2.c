@@ -5,7 +5,7 @@
 typedef struct LinkedListNode {
     long int first;
     long int last;
-    struct LinkedListNode* next;
+    struct LinkedListNode *next;
 } LinkedListNode;
 
 /*
@@ -16,7 +16,7 @@ typedef struct LinkedListNode {
  * @param head Head of the linked list the ranges will be saved to
  * @param tail Tail of the linked list the ranges will be saved to
  */
-void processInput(char* input, LinkedListNode** head, LinkedListNode** tail);
+void processInput(char *input, LinkedListNode **head, LinkedListNode **tail);
 
 /*
  * Finds the invalid ID in a range by specifications of AOC day 2
@@ -25,7 +25,7 @@ void processInput(char* input, LinkedListNode** head, LinkedListNode** tail);
  * @param end Last ID in the range
  * @return Sum of all invalid IDs in the range
  */
-void findInvalidId(long int start, long int end, long int* password);
+void findInvalidId(long int start, long int end, long int *password);
 
 /*
  * Determines whether the given ID is invalid
@@ -33,13 +33,13 @@ void findInvalidId(long int start, long int end, long int* password);
  */
 long int isInvalidId(long int id);
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
     if (argc < 2) {
         printf("Please specify a file containing the inputs");
         exit(1);
     }
 
-    FILE* fptr = fopen(argv[1], "r");
+    FILE *fptr = fopen(argv[1], "r");
 
     if (fptr == NULL) {
         printf("Failed to open file");
@@ -58,15 +58,15 @@ int main(int argc, char** argv) {
     fclose(fptr);
     
     // Save input as linked list
-    LinkedListNode* head = NULL;
-    LinkedListNode* tail = NULL;
+    LinkedListNode *head = NULL;
+    LinkedListNode *tail = NULL;
     processInput(buffer, &head, &tail);
 
     // Find invalid IDs!
     // Part 1: IDs are invalid if the number is made of a sequence repeated twice
     // Part 2: IDs are invalid if the number is made of a sequence repeated AT LEAST twice
     // [0] Password for part 1; [1] Password for part 2
-    long int* password = malloc(sizeof(long int) * 2);
+    long int *password = malloc(sizeof(long int) * 2);
     password[0] = 0;
     password[1] = 0;
 
@@ -82,24 +82,24 @@ int main(int argc, char** argv) {
     // Free LinkedList
     tail = head;
     while (tail != NULL) {
-        LinkedListNode* tempNode = tail;
+        LinkedListNode *tempNode = tail;
         tail = tail->next;
         free(tempNode);
     }
 
 }
 
-void processInput(char* input, LinkedListNode** head, LinkedListNode** tail) {
+void processInput(char *input, LinkedListNode **head, LinkedListNode **tail) {
     // Range values (delimited by comma)
-    char* rangeSavePtr = NULL;
-    char* idSavePtr = NULL;
-    char* rangeToken = strtok_r(input, ",", &rangeSavePtr);
+    char *rangeSavePtr = NULL;
+    char *idSavePtr = NULL;
+    char *rangeToken = strtok_r(input, ",", &rangeSavePtr);
     while (rangeToken != NULL) {
-        LinkedListNode* node = malloc(sizeof(LinkedListNode));
+        LinkedListNode *node = malloc(sizeof(LinkedListNode));
         node->next = NULL;
 
         // First/Last ID values (delimited by dash)
-        char* idToken = strtok_r(rangeToken, "-", &idSavePtr);
+        char *idToken = strtok_r(rangeToken, "-", &idSavePtr);
         int isLastId = 0;
         while (idToken != NULL) {
             if (!isLastId) {
@@ -124,7 +124,7 @@ void processInput(char* input, LinkedListNode** head, LinkedListNode** tail) {
     }
 }
 
-void findInvalidId(long int start, long int end, long int* password) {
+void findInvalidId(long int start, long int end, long int *password) {
     for (long int i = start; i <= end; i++) {
         // Count digits
         int digits = 0;
@@ -147,7 +147,7 @@ void findInvalidId(long int start, long int end, long int* password) {
             int segmentCount = digits / j;
             if (segmentCount == 0) continue;
 
-            char** idSegments = malloc(segmentCount * sizeof(char*));
+            char **idSegments = malloc(segmentCount * sizeof(char*));
 
             for (int k = 0; k < segmentCount; k++) {
                 idSegments[k] = malloc(j + 1);
